@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 
-// Copy electron files into build/ so electron-builder's react-cra preset finds them
 fs.copyFileSync(
   path.join(__dirname, "electron", "main.js"),
   path.join(__dirname, "build", "electron.js")
