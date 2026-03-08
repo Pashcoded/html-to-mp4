@@ -2,15 +2,16 @@
   "name": "html2video",
   "version": "1.0.0",
   "description": "Convert HTML/CSS animations to video",
-  "main": "electron/main.js",
+  "author": "Pashcoded",
+  "main": "build/electron.js",
   "homepage": "./",
   "scripts": {
     "dev": "concurrently \"cross-env BROWSER=none react-scripts start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
     "react-build": "react-scripts build",
-    "build": "npm run react-build && electron-builder --win --x64",
-    "build:win": "npm run react-build && electron-builder --win --x64",
-    "build:mac": "npm run react-build && electron-builder --mac",
-    "build:linux": "npm run react-build && electron-builder --linux"
+    "build": "npm run react-build && node build-electron.js && electron-builder --win --x64",
+    "build:win": "npm run react-build && node build-electron.js && electron-builder --win --x64",
+    "build:mac": "npm run react-build && node build-electron.js && electron-builder --mac",
+    "build:linux": "npm run react-build && node build-electron.js && electron-builder --linux"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -31,10 +32,11 @@
   "build": {
     "appId": "com.html2video.app",
     "productName": "HTML to Video",
-    "directories": { "output": "dist" },
+    "directories": {
+      "output": "dist"
+    },
     "files": [
       "build/**/*",
-      "electron/**/*",
       "node_modules/**/*",
       "!node_modules/puppeteer-core/.local-chromium/**/*"
     ],
