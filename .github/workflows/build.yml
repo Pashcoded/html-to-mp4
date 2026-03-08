@@ -10,6 +10,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
+      - name: Clear old build
+        run: |
+          if (Test-Path build) { Remove-Item -Recurse -Force build }
+        shell: pwsh
       - run: npm install
       - run: npm run build:win
         env:
