@@ -31,43 +31,10 @@
   "build": {
     "appId": "com.html2video.app",
     "productName": "HTML to Video",
+    "extraMetadata": {
+      "main": "electron/main.js"
+    },
     "directories": { "output": "dist" },
     "files": [
       "build/**/*",
-      "electron/**/*",
-      "node_modules/**/*",
-      "!node_modules/puppeteer-core/.local-chromium/**/*"
-    ],
-    "extraResources": [
-      {
-        "from": "node_modules/ffmpeg-static/",
-        "to": "ffmpeg-static/",
-        "filter": ["**/*"]
-      }
-    ],
-    "win": {
-      "target": [{ "target": "nsis", "arch": ["x64"] }],
-      "icon": "public/icon.ico",
-      "requestedExecutionLevel": "asInvoker"
-    },
-    "mac": {
-      "target": "dmg",
-      "icon": "public/icon.icns"
-    },
-    "linux": {
-      "target": "AppImage"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "installerIcon": "public/icon.ico",
-      "uninstallerIcon": "public/icon.ico"
-    }
-  },
-  "browserslist": {
-    "production": [">0.2%", "not dead", "not op_mini all"],
-    "development": ["last 1 chrome version"]
-  }
-}
+      "electr
