@@ -84,12 +84,41 @@ ipcMain.handle("render-video", async (event, opts) => {
     const tmpHtml = path.join(tmpDir, "index.html");
     await fs.writeFile(tmpHtml, html, "utf-8");
     await rendererWin.loadFile(tmpHtml);
-    await new Promise(r => setTimeout(r, 500));
+
+    // Wait for page to fully load and animations to initialize
+    await new Promise(r => setTimeout(r, 800));
+
+    // Pause all CSS animations immediately
+    await rendererWin.webContents.executeJavaScript(`
+      document.querySelectorAll('*').forEach(el => {
+        el.style.animationPlayState = 'paused';
+      });
+    `);
 
     const msPerFrame = 1000 / fps;
+
     for (let i = 0; i < totalFrames; i++) {
       if (event.sender.isDestroyed()) throw new Error("Window closed");
-      await rendererWin.webContents.executeJavaScript(`window.__frameTime = ${i * msPerFrame};`);
+
+      const timeSec = (i * msPerFrame) / 1000;
+
+      // Seek all CSS animations to this frame's timestamp using negative delay trick
+      await rendererWin.webContents.executeJavaScript(`
+        document.querySelectorAll('*').forEach(el => {
+          const style = window.getComputedStyle(el);
+          if (style.animationName && style.animationName !== 'none') {
+            el.style.animationDelay = '-' + ${timeSec} + 's';
+            el.style.animationPlayState = 'paused';
+          }
+        });
+        // Support JS-driven animations via __frameTime
+        window.__frameTime = ${i * msPerFrame};
+        if (typeof window.__onFrameTick === 'function') window.__onFrameTick(${i * msPerFrame});
+      `);
+
+      // Wait for repaint
+      await new Promise(r => setTimeout(r, 50));
+
       const img = await rendererWin.webContents.capturePage({ x: 0, y: 0, width, height });
       await fs.writeFile(path.join(tmpDir, `frame_${String(i).padStart(6, "0")}.png`), img.toPNG());
       send("progress", { pct: Math.round(((i + 1) / totalFrames) * 70), msg: `Frame ${i + 1}/${totalFrames}` });
